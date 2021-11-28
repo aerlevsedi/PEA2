@@ -89,6 +89,11 @@ namespace PEA_Project2
                         Console.WriteLine("\n5. Algorytm symulowanego wyżarzania\n");
                         var timesThread = new Thread(() =>
                         {
+                            if (timeToStop <= 0)
+                            {
+                                return;
+                            }
+
                             const int n = 6;
                             for (var i = 0; i < n; i++)
                             {
@@ -108,7 +113,12 @@ namespace PEA_Project2
                         Console.WriteLine("\n6. Algorytm tabu search\n");
                         var timesThread2 = new Thread(() =>
                         {
-                            const int n = 10;
+                            if (timeToStop <= 0)
+                            {
+                                return;
+                            }
+
+                            const int n = 6;
                             for (var i = 0; i < n; i++)
                             {
                                 Thread.Sleep(timeToStop * 1000 / n);
