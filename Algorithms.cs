@@ -8,7 +8,7 @@ namespace PEA_Project2
     public class Algorithms
     {
         private static Random random = new Random();
-
+        public static int [] bestPath;
         private static void Shuffle(int[] array)
         {
             var n = array.Length;
@@ -45,7 +45,7 @@ namespace PEA_Project2
             const double alpha = 0.99;
 
             // wygenerowana losowa sciezka przypisywana jest jako najlepsze rozwiazanie
-            var bestPath = currentPath;
+            bestPath = currentPath;
             var bestPathCost = currentCost;
             var stopwatch = new Stopwatch();
             time *= 1000; //zamiana sekund na milisekundy
@@ -107,7 +107,7 @@ namespace PEA_Project2
             bool diversification)
         {
             var currentPath = GenerateRandomPath(matrix, out var currentCost);
-            var bestPath = currentPath;
+            bestPath = currentPath;
             var bestPathCost = currentCost;
             var tabuList = new Dictionary<(int, int), int>();
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace PEA_Project2
 {
@@ -16,6 +17,7 @@ namespace PEA_Project2
         private static bool diversification;
         private static Matrix _matrix;
         private static Action<int[], int, int> neighbourFunc = Algorithms.Swap;
+        private static Stopwatch stopwatch = new Stopwatch();
 
         public static void MenuText()
         {
@@ -33,7 +35,7 @@ namespace PEA_Project2
                 {
                     Console.WriteLine("Sąsiedztwo: Swap");
                 }
-                
+
                 Console.WriteLine($"Czas wykonywania algorytmu: {timeToStop}s");
 
                 Console.WriteLine(Menu.Welcome);
@@ -74,23 +76,51 @@ namespace PEA_Project2
                             case "1":
                                 neighbourFunc = Algorithms.Reverse;
                                 break;
-                            case  "2":
+                            case "2":
                                 neighbourFunc = Algorithms.Swap;
                                 break;
                             default:
                                 Console.WriteLine("Niepoprawny wybór sąsiedztwa");
-                                    break;
-                            
+                                break;
                         }
+
                         break;
                     case "5":
                         Console.WriteLine("\n5. Algorytm symulowanego wyżarzania\n");
+                        var timesThread = new Thread(() =>
+                        {
+                            const int n = 6;
+                            for (var i = 0; i < n; i++)
+                            {
+                                Thread.Sleep((int)(timeToStop * 1000 / n));
+                                Console.WriteLine(
+                                    $"{stopwatch.ElapsedMilliseconds / 1000.0}s: {_matrix.CalculateRouteCost(Algorithms.bestPath)}");
+                            }
+                        });
+                        timesThread.Start();
+                        stopwatch.Restart();
                         _bestPath = Algorithms.SimulatedAnnealing(_matrix, timeToStop, neighbourFunc);
+                        stopwatch.Stop();
+                        timesThread.Join();
                         Console.WriteLine(_matrix.CalculateRouteCost(_bestPath));
                         break;
                     case "6":
                         Console.WriteLine("\n6. Algorytm tabu search\n");
+                        var timesThread2 = new Thread(() =>
+                        {
+                            const int n = 6;
+                            for (var i = 0; i < n; i++)
+                            {
+                                Thread.Sleep((int)(timeToStop * 1000 / n));
+                                Console.WriteLine(
+                                    $"{stopwatch.ElapsedMilliseconds / 1000.0}s: {_matrix.CalculateRouteCost(Algorithms.bestPath)}");
+                            }
+                        });
+                        timesThread2.Start();
+                        stopwatch.Restart();
                         _bestPath = Algorithms.TabuSearch(_matrix, timeToStop, neighbourFunc, diversification);
+                        stopwatch.Stop();
+                        timesThread2.Join();
                         Console.WriteLine(_matrix.CalculateRouteCost(_bestPath));
                         break;
 
@@ -105,78 +135,6 @@ namespace PEA_Project2
                         continue;
                 }
             }
-        }
-
-        private static void RunAlgorithm(Func<int[,], IList<int>> algorithm, int[,] graph)
-        {
-            // Stopwatch sw;
-            // sw = Stopwatch.StartNew();
-            // bestPath = algorithm(graph);
-            // sw.Stop();
-            // var elapsedTime = sw.ElapsedMilliseconds;
-            // Console.WriteLine($"Elapsed time: {elapsedTime / 1000.0} s");
-            // Console.WriteLine("Best path:");
-            // Algorithms.WriteList(bestPath);
-            // Console.WriteLine($"Path cost: {Algorithms.bestPathCost}");
-        }
-
-        
-
-        private static double TimeMeasure(Func<int[,], IList<int>> algorithm, int[,] graph)
-        {
-            Stopwatch sw;
-            var nanosecondsPerTick = 1000000000L / Stopwatch.Frequency;
-            sw = Stopwatch.StartNew();
-            _bestPath = algorithm(graph);
-            sw.Stop();
-            return sw.ElapsedTicks * nanosecondsPerTick;
-        }
-
-        private static void AutomaticTest()
-        {
-            var size = 10;
-            var bruteForceResults = new List<double>();
-            var dynamicProgrammingResults = new List<double>();
-            int[,] graph;
-            while (size < 21)
-            {
-                double bfTime = 0;
-                double dpTime = 0;
-
-                var bfAverageTime = bfTime / 100000000.0;
-                var dpAverageTime = dpTime / 100000000.0;
-                bruteForceResults.Add(bfAverageTime);
-                dynamicProgrammingResults.Add(dpAverageTime);
-                Console.WriteLine($"Brute Force for size {size}: {bfAverageTime}");
-                Console.WriteLine(
-                    $"Dynamic Programming for size {size}: {dpAverageTime}");
-                size++;
-            }
-
-            using (var file = new StreamWriter("wyniki.csv"))
-            {
-                foreach (var result in bruteForceResults)
-                {
-                    file.Write($"{result};");
-                }
-
-                file.WriteLine();
-                foreach (var result in dynamicProgrammingResults)
-                {
-                    file.Write($"{result};");
-                }
-            }
-        }
-
-        private static Boolean Warning(string p)
-        {
-            if (p != null)
-            {
-                Console.WriteLine("Nie wczytano pliku!");
-
-                return false;
-            }
-            return true;
         }
     }
 }
