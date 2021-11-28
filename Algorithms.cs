@@ -112,7 +112,8 @@ namespace PEA_Project2
             var tabuList = new Dictionary<(int, int), int>();
 
             const int maxTerm = 20;
-            var criticalEvents = 0;
+            var iterations = 0;
+            var maxIterations = matrix.Size * matrix.Size;
 
             var stopwatch = new Stopwatch();
             time *= 1000; //zamiana sekund na milisekundy
@@ -165,20 +166,18 @@ namespace PEA_Project2
                     bestPathCost = bestNeighbourCost;
                     currentPath = bestNeighbour;
                     currentCost = bestNeighbourCost;
-                    criticalEvents = 0;
                 }
                 else if (bestNeighbourCost < currentCost)
                 {
                     currentPath = bestNeighbour;
                     currentCost = bestNeighbourCost;
-                    criticalEvents = 0;
                 }
-                else if (diversification)
+                if (diversification)
                 {
-                    criticalEvents++;
-                    if (criticalEvents > 20) // todo pobawic sie parametrami
+                    iterations++;
+                    if (iterations > maxIterations)
                     {
-                        criticalEvents = 0;
+                        iterations = 0;
                         Shuffle(currentPath);
                         currentCost = matrix.CalculateRouteCost(currentPath);
                         if (currentCost < bestPathCost)

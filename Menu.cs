@@ -70,7 +70,7 @@ namespace PEA_Project2
                         break;
                     case "4":
                         Console.WriteLine("\n4. Wybór sąsiedztwa \n");
-                        Console.WriteLine("\n1. Reverse \n 2. Swap \n");
+                        Console.WriteLine("\n1. Reverse\n2. Swap \n");
                         switch (Console.ReadLine())
                         {
                             case "1":
@@ -92,7 +92,7 @@ namespace PEA_Project2
                             const int n = 6;
                             for (var i = 0; i < n; i++)
                             {
-                                Thread.Sleep((int)(timeToStop * 1000 / n));
+                                Thread.Sleep(timeToStop * 1000 / n);
                                 Console.WriteLine(
                                     $"{stopwatch.ElapsedMilliseconds / 1000.0}s: {_matrix.CalculateRouteCost(Algorithms.bestPath)}");
                             }
@@ -108,10 +108,10 @@ namespace PEA_Project2
                         Console.WriteLine("\n6. Algorytm tabu search\n");
                         var timesThread2 = new Thread(() =>
                         {
-                            const int n = 6;
+                            const int n = 10;
                             for (var i = 0; i < n; i++)
                             {
-                                Thread.Sleep((int)(timeToStop * 1000 / n));
+                                Thread.Sleep(timeToStop * 1000 / n);
                                 Console.WriteLine(
                                     $"{stopwatch.ElapsedMilliseconds / 1000.0}s: {_matrix.CalculateRouteCost(Algorithms.bestPath)}");
                             }
