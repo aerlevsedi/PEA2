@@ -9,6 +9,7 @@ namespace PEA_Project2
     {
         private static Random random = new Random();
         public static int [] bestPath;
+
         private static void Shuffle(int[] array)
         {
             var n = array.Length;
@@ -32,7 +33,7 @@ namespace PEA_Project2
                 (j, i) = (i, j);
             }
 
-            Array.Reverse(array, i, j - i);
+            Array.Reverse(array, i, j - i + 1);
         }
 
         public static int[] SimulatedAnnealing(Matrix matrix, int time, Action<int[], int, int> neighbourFunc)
@@ -40,7 +41,7 @@ namespace PEA_Project2
             // wygeneruj losowa sciezke bedaca poczatkowym rozwiazaniem
 
             var currentPath = GenerateRandomPath(matrix, out var currentCost);
-            double temperature = matrix.Size * matrix.Size; // TODO zbadanie potem  
+            double temperature = matrix.Size * matrix.Size;
 
             const double alpha = 0.99;
 
@@ -57,7 +58,13 @@ namespace PEA_Project2
                     var neighbourPath = currentPath.Clone() as int[];
                     var i = random.Next(1, matrix.Size);
                     var j = random.Next(1, matrix.Size);
-
+                    
+                    // sprawdzenie czy nie sa te same
+                    while (i == j)
+                    {
+                        j = random.Next(1, matrix.Size);
+                    }    
+                    
                     // wylosowanie sciezki z sasiedztwa aktualnego rozwiazania
 
                     neighbourFunc(neighbourPath, i, j);
@@ -77,7 +84,7 @@ namespace PEA_Project2
                     else
                     {
                         if (neighbourCost >= currentCost &&
-                            !(random.NextDouble() < Math.Exp((neighbourCost - currentCost) / temperature))) continue;
+                            !(random.NextDouble() < Math.Exp(-(neighbourCost - currentCost) / temperature))) continue;
                         // przyjmujemy je jako aktualne rozwiazanie, jesli jest wystarczajaco goraco 
                         // (im jest cieplej, tym wieksza szansa na to, ze to nowe bedzie wziete, mimo ze jest gorsze)
 
@@ -101,8 +108,6 @@ namespace PEA_Project2
             return currentPath;
         }
 
-        //TODO lista tabu w formie hashmapy (slownik) z kluczami bedacymi para liczb
-
         public static int[] TabuSearch(Matrix matrix, int time, Action<int[], int, int> neighbourFunc,
             bool diversification)
         {
@@ -111,7 +116,7 @@ namespace PEA_Project2
             var bestPathCost = currentCost;
             var tabuList = new Dictionary<(int, int), int>();
 
-            const int maxTerm = 20;
+            var maxTerm = matrix.Size/2;
             var iterations = 0;
             var maxIterations = matrix.Size * matrix.Size;
 
@@ -120,7 +125,7 @@ namespace PEA_Project2
             stopwatch.Start();
             while (stopwatch.ElapsedMilliseconds <= time) // warunek zatrzymania
             {
-                int[] bestNeighbour = Array.Empty<int>();
+                int [] bestNeighbour = Array.Empty<int>();
                 var bestNeighbourCost = int.MaxValue;
 
                 var bestPair = (0, 0);
@@ -144,7 +149,7 @@ namespace PEA_Project2
 
                 try
                 {
-                    tabuList.Add(bestPair, random.Next(1, maxTerm));
+                    tabuList.Add(bestPair, maxTerm); // zmiana
                 }
                 catch (Exception e)
                 {
@@ -178,8 +183,7 @@ namespace PEA_Project2
                     if (iterations > maxIterations)
                     {
                         iterations = 0;
-                        Shuffle(currentPath);
-                        currentCost = matrix.CalculateRouteCost(currentPath);
+                        currentPath = GenerateRandomPath(matrix, out currentCost);
                         if (currentCost < bestPathCost)
                         {
                             bestPath = currentPath;

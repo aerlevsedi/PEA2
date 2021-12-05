@@ -132,6 +132,7 @@ namespace PEA_Project2
                         stopwatch.Stop();
                         timesThread2.Join();
                         Console.WriteLine(_matrix.CalculateRouteCost(_bestPath));
+                        WriteList(_bestPath);
                         break;
 
                     case "7":
@@ -145,6 +146,16 @@ namespace PEA_Project2
                         continue;
                 }
             }
+        }
+
+        public static void WriteList(IList<int> list)
+        {
+            foreach (var elem in list)
+            {
+                Console.Write($"{elem}, ");
+            }
+
+            Console.WriteLine();
         }
     }
 }
